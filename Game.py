@@ -2,7 +2,7 @@ from pico2d import *
 
 class Player:
     def __init__(self):
-        self.image = load_image('player\Idle.png')
+        self.image = load_image('image\player.png')
         self.x, self.y = 400, 300
         self.frame = 0
         pass
