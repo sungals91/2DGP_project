@@ -1,5 +1,19 @@
 from pico2d import *
 
+class Background:
+    image = None
+
+    def __init__(self):
+        self.x, self.y = 0, 0
+        if Background.image == None:
+            Background.image = load_image('image\\wall.png')
+    def update(self):
+        pass
+    def draw(self):
+        for i in range(6):
+            for k in range(7):
+                self.image.draw(self.x + k*128, self.y + i*128)
+
 class Player:
     def __init__(self):
         self.image = load_image('image\\player.png')
@@ -43,12 +57,18 @@ def reset_world():
     global running
     global world
     global player
+    global background
 
     running = True
     world = []
 
+    background = Background()
+    world.append(background)
+
     player = Player()
     world.append(player)
+
+
     pass
 
 def update_world():
