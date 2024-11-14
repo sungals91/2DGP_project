@@ -1,7 +1,18 @@
 from pico2d import load_image
 from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDLK_LEFT, SDLK_UP, SDLK_DOWN, SDL_KEYUP
-
 from state_machine import StateMachine
+
+# Player Run Speed
+PIXEL_PER_METER = (10.0 / 0.2) # 10 pixel 20cm
+RUN_SPEED_KMPH = 20.0 # km / Hour
+RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+# Player Action Speed
+TIME_PER_ACTION = 0.5
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+FRAMES_PER_ACTION = 8
 
 class Idle:
     @staticmethod
