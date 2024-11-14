@@ -1,34 +1,8 @@
 from pico2d import *
 
+from Background import Background
+from Floor import Floor
 from Player import Player
-
-
-class Floor:
-    image = None
-    def __init__(self):
-        self.x, self.y = 0, 200
-        if Floor.image == None:
-            Floor.image = load_image('image//tile.png')
-    def update(self):
-        pass
-    def draw(self):
-        for i in range(13):
-            self.image.clip_draw(0,220,70,20,self.x + i*70,self.y)
-        pass
-
-class Background:
-    image = None
-
-    def __init__(self):
-        self.x, self.y = 0, 0
-        if Background.image == None:
-            Background.image = load_image('image\\wall.png')
-    def update(self):
-        pass
-    def draw(self):
-        for i in range(6):
-            for k in range(7):
-                self.image.draw(self.x + k*128, self.y + i*128)
 
 
 def reset_world():
