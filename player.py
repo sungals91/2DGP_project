@@ -65,6 +65,12 @@ class Player:
         self.frame = 0
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
+        self.state_machine.set_transitions(
+            {
+                Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run},
+                Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle},
+            }
+        )
 
     def update(self):
         #self.frame = (self.frame + 1) % 8
