@@ -1,6 +1,6 @@
 from pico2d import load_image
 from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDLK_LEFT, SDLK_UP, SDLK_DOWN, SDL_KEYUP
-from state_machine import StateMachine
+from state_machine import *
 
 # Player Run Speed
 PIXEL_PER_METER = (10.0 / 0.2) # 10 pixel 20cm
@@ -38,8 +38,11 @@ class Idle:
 
 class Run:
     @staticmethod
-    def enter(player):
-        pass
+    def enter(player, e):
+        if right_down(e) or left_up(e): # 오른쪽으로 RUN
+            player.dir, player.face_dir, player.action = 1, 1, 1
+        elif left_down(e) or right_up(e): # 왼쪽으로 RUN
+            player.dir, player.face_dir, player.action = -1, -1, 0
 
     @staticmethod
     def exit(player):
@@ -75,25 +78,5 @@ class Player:
         pass
 
     def handle_event(self, event):
+        self.state_machine.add_event(('INPUT', event))
         pass
-'''
-        if event.type == SDL_KEYDOWN:
-            if event.key == SDLK_RIGHT:
-                self.dir_x += 1
-            elif event.key == SDLK_LEFT:
-                self.dir_x -= 1
-            elif event.key == SDLK_UP:
-                self.dir_y += 1
-            elif event.key == SDLK_DOWN:
-                self.dir_y -= 1
-
-        elif event.type == SDL_KEYUP:
-            if event.key == SDLK_RIGHT:
-                self.dir_x -= 1
-            elif event.key == SDLK_LEFT:
-                self.dir_x += 1
-            elif event.key == SDLK_UP:
-                self.dir_y -= 1
-            elif event.key == SDLK_DOWN:
-                self.dir_y += 1
-'''
