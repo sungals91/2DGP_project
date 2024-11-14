@@ -1,5 +1,7 @@
 from pico2d import load_image
 from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDLK_LEFT, SDLK_UP, SDLK_DOWN, SDL_KEYUP
+
+import game_framework
 from state_machine import *
 
 # Player Run Speed
@@ -29,12 +31,12 @@ class Idle:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + 1) % 8
+        player.frame = (player.frame + FRAMES_PER_ACTION*ACTION_PER_TIME*game_framework.frame_time) % 8
         pass
 
     @staticmethod
     def draw(player):
-        player.image.clip_draw(player.frame * 200, 0, 50, 60, player.x, player.y)
+        player.image.clip_draw(int(player.frame) * 200, 0, 50, 60, player.x, player.y)
 
 
 class Run:
