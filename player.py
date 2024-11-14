@@ -18,23 +18,24 @@ FRAMES_PER_ACTION = 8
 
 class Idle:
     @staticmethod
-    def enter(player):
+    def enter(player, e):
         print('Player Idle Enter')
         pass
 
     @staticmethod
-    def exit(player):
+    def exit(player, e):
         print('Player Idle Exit')
         pass
 
     @staticmethod
-    def do(player):
+    def do(player, e):
         player.frame = (player.frame + 1) % 8
         pass
 
     @staticmethod
-    def draw(player):
+    def draw(player, e):
         player.image.clip_draw(player.frame * 200, 0, 50, 60, player.x, player.y)
+
 
 class Run:
     @staticmethod
@@ -45,15 +46,15 @@ class Run:
             player.dir, player.face_dir, player.action = -1, -1, 0
 
     @staticmethod
-    def exit(player):
+    def exit(player, e):
         pass
 
     @staticmethod
-    def do(player):
+    def do(player, e):
         pass
 
     @staticmethod
-    def draw(player):
+    def draw(player, e):
         pass
 
 
