@@ -28,12 +28,12 @@ class Idle:
         pass
 
     @staticmethod
-    def do(player, e):
+    def do(player):
         player.frame = (player.frame + 1) % 8
         pass
 
     @staticmethod
-    def draw(player, e):
+    def draw(player):
         player.image.clip_draw(player.frame * 200, 0, 50, 60, player.x, player.y)
 
 
