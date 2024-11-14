@@ -14,6 +14,8 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 
+
+
 class Idle:
     @staticmethod
     def enter(player):
@@ -33,6 +35,24 @@ class Idle:
     @staticmethod
     def draw(player):
         player.image.clip_draw(player.frame * 200, 0, 50, 60, player.x, player.y)
+
+class Run:
+    @staticmethod
+    def enter(player):
+        pass
+
+    @staticmethod
+    def exit(player):
+        pass
+
+    @staticmethod
+    def do(player):
+        pass
+
+    @staticmethod
+    def draw(player):
+        pass
+
 
 class Player:
     def __init__(self):
