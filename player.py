@@ -105,7 +105,7 @@ class Jump:
         if player.face_dir == 1:
             player.image.clip_draw(int(player.frame) * 200, 75 * 5, 50, 50, player.x, player.y)
         elif player.face_dir == -1:
-            player.image.clip_composite_draw(int(player.frame) * 200, 75 * 4, 50, 50,
+            player.image.clip_composite_draw(int(player.frame) * 200, 75 * 5, 50, 50,
                                              0, 'h', player.x, player.y, 50, 50)
 
 class Attack:
@@ -119,7 +119,9 @@ class Attack:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 5
+        player.frame = (player.frame + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
+        if int(player.frame) == 5:
+            player.state_machine.add_event(('ATK_END', 0))
         pass
 
     @staticmethod
@@ -146,7 +148,7 @@ class Player:
                 Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, up_down : Jump, a_down : Attack},
                 Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, up_down: Jump, a_down : Attack},
                 Jump: {land : Idle, a_down : Attack},
-                Attack: {},
+                Attack: {atk_end : Idle},
             }
         )
         self.is_flying = True
