@@ -125,7 +125,7 @@ class Attack:
         player.frame = (player.frame + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
         if int(player.frame) == 5:
             player.collide_state = 'idle'
-            player.state_machine.add_event(('ATK_END', 0))
+            player.state_machine.add_event(('ACT_END', 0))
         pass
 
     @staticmethod
@@ -153,7 +153,7 @@ class Player:
                 Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, up_down : Jump, a_down : Attack},
                 Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, up_down: Jump, a_down : Attack},
                 Jump: {land : Idle, a_down : Attack},
-                Attack: {atk_end : Idle},
+                Attack: {act_end : Idle},
             }
         )
         self.is_flying = True
@@ -177,7 +177,10 @@ class Player:
         if self.collide_state == 'idle':
             return self.x -25, self.y - 25, self.x + 25, self.y + 25
         elif self.collide_state == 'atk':
-            return self.x -25, self.y - 25, self.x + 75, self.y + 25
+            if self.face_dir == 1:
+                return self.x -25, self.y - 25, self.x + 75, self.y + 25
+            elif self.face_dir == -1:
+                return self.x -75, self.y - 25, self.x + 25, self.y + 25
 
     def handle_collision(self, group, other):
         if group == 'player:floor':

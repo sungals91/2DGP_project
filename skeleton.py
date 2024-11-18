@@ -22,6 +22,8 @@ class Idle:
     @staticmethod
     def enter(skeleton, e):
         print('skeleton Idle Enter')
+        skeleton.wait_time = get_time()
+        skeleton.ran_time = random.uniform(1, 2)
         pass
 
     @staticmethod
@@ -34,19 +36,25 @@ class Idle:
         if skeleton.is_flying:
             skeleton.y -= 1
         skeleton.frame = (skeleton.frame + 4 * ACTION_PER_TIME * game_framework.frame_time) % 4
+        if get_time() - skeleton.wait_time > skeleton.ran_time:
+            skeleton.dir = skeleton.dir * -1
+            print(' DEBUG:  TIME_OUT')
+            skeleton.state_machine.add_event(('TIME_OUT', 0))
         pass
 
     @staticmethod
     def draw(skeleton):
-        if skeleton.face_dir == 1:
+        if skeleton.dir == 1:
             skeleton.image.clip_draw(int(skeleton.frame) * 150, 0, 50, 50, skeleton.x, skeleton.y)
-        elif skeleton.face_dir == -1:
+        elif skeleton.dir == -1:
             skeleton.image.clip_composite_draw(int(skeleton.frame) * 150, 0, 50, 50,
                                           0, 'h', skeleton.x, skeleton.y, 50, 50)
 
 class Walk:
     @staticmethod
     def enter(skeleton, e):
+        skeleton.wait_time = get_time()
+        skeleton.ran_time = random.uniform(1, 2)
         pass
 
     @staticmethod
@@ -58,28 +66,52 @@ class Walk:
         if skeleton.is_flying:
             skeleton.jump_speed -= GRAVITY * game_framework.frame_time
             skeleton.y += skeleton.jump_speed * game_framework.frame_time
+
         skeleton.x += skeleton.dir * RUN_SPEED_PPS * game_framework.frame_time
         skeleton.frame = (skeleton.frame + 4 * ACTION_PER_TIME * game_framework.frame_time) % 4
+
         if skeleton.x > 600:
             skeleton.dir = -1
-        elif skeleton.x < 200:
+        elif skeleton.x <200:
             skeleton.dir = 1
         skeleton.x = clamp(200, skeleton.x, 600)
+
+        if get_time() - skeleton.wait_time > skeleton.ran_time:
+            skeleton.state_machine.add_event(('TIME_OUT', 0))
         pass
 
     @staticmethod
     def draw(skeleton):
-        if skeleton.face_dir == 1:
+        if skeleton.dir == 1:
             skeleton.image.clip_draw(int(skeleton.frame) * 150, 75 * 2, 50, 50, skeleton.x, skeleton.y)
-        elif skeleton.face_dir == -1:
-            skeleton.image.clip_composite_draw(int(skeleton.frame) * 150, 72 * 2, 50, 50,
+        elif skeleton.dir == -1:
+            skeleton.image.clip_composite_draw(int(skeleton.frame) * 150, 75 * 2, 50, 50,
                                           0, 'h', skeleton.x, skeleton.y, 50, 50)
         pass
 
 class Hit:
     @staticmethod
-    def enter():
+    def enter(skeleton, e):
         pass
+
+    @staticmethod
+    def exit(skeleton, e):
+        pass
+
+    @staticmethod
+    def do(skeleton):
+        skeleton.frame = (skeleton.frame + 4 * ACTION_PER_TIME * game_framework.frame_time) % 4
+        if int(skeleton.frame) == 3:
+            skeleton.state_machine.add_event(('ACT_END', 0))
+        pass
+
+    @staticmethod
+    def draw(skeleton):
+        if skeleton.dir == 1:
+            skeleton.image.clip_draw(int(skeleton.frame) * 150, 75 * 3, 50, 50, skeleton.x, skeleton.y)
+        elif skeleton.dir == -1:
+            skeleton.image.clip_composite_draw(int(skeleton.frame) * 150, 75 * 3, 50, 50,
+                                          0, 'h', skeleton.x, skeleton.y, 50, 50)
 
 class Skeleton:
     image = None
@@ -91,11 +123,12 @@ class Skeleton:
         self.jump_speed = 0
         self.frame = 0
         self.state_machine = StateMachine(self)
-        self.state_machine.start(Walk)
+        self.state_machine.start(Idle)
         self.state_machine.set_transitions(
             {
-                Idle: {},
-                Walk: {}
+                Idle: {time_out : Walk, hit : Hit},
+                Walk: {time_out : Idle, hit : Hit},
+                Hit : {act_end : Idle}
             }
         )
         self.is_flying = True
@@ -114,7 +147,7 @@ class Skeleton:
         pass
 
     def get_bb(self):
-        return self.x - 25, self.y - 25, self.x + 15, self.y + 25
+        return self.x - 25, self.y - 25, self.x + 25, self.y + 30
         pass
 
     def handle_collision(self, group, other):
@@ -124,6 +157,7 @@ class Skeleton:
         if group == 'player_atk:skeleton_hit' and other.collide_state == 'atk':
             print('SKELETON HIT')
             self.hp -= 1
-            if self.hp == 0:
-                game_world.remove_object(self)
+            self.state_machine.add_event(('HIT', 0))
+            #if self.hp == 0:
+            #    game_world.remove_object(self)
         pass
