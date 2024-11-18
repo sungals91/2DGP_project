@@ -1,4 +1,4 @@
-from pico2d import load_image, draw_rectangle
+from pico2d import load_image, draw_rectangle, get_time
 from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDLK_LEFT, SDLK_UP, SDLK_DOWN, SDL_KEYUP
 
 import game_framework
@@ -10,6 +10,9 @@ RUN_SPEED_KMPH = 20.0 # km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+GRAVITY = 10.0 * PIXEL_PER_METER  # 중력 값
+JUMP_SPEED = 6.5 * PIXEL_PER_METER
 
 # Player Action Speed
 TIME_PER_ACTION = 0.5
@@ -69,6 +72,41 @@ class Run:
                                           0, 'h', player.x, player.y, 50, 50)
         pass
 
+class Jump:
+    @staticmethod
+    def enter(player, e):
+        print('Player Jump Enter')
+        player.is_flying = True  # 점프 중 상태
+        player.jump_speed = JUMP_SPEED
+        player.start_y = player.y
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        print('Player Jump Exit')
+        player.jump_speed = 0
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
+        player.jump_speed -= GRAVITY * game_framework.frame_time
+        player.y += player.jump_speed * game_framework.frame_time
+        if player.jump_speed <= 0:
+            player.is_flying = True
+            if player.y - player.start_y <= 0:
+                player.state_machine.add_event(('LAND', 0))
+        print(f'{player.is_flying}')
+
+    @staticmethod
+    def draw(player):
+        if player.face_dir == 1:
+            player.image.clip_draw(int(player.frame) * 200, 75 * 5, 50, 50, player.x, player.y)
+        elif player.face_dir == -1:
+            player.image.clip_composite_draw(int(player.frame) * 200, 75 * 4, 50, 50,
+                                             0, 'h', player.x, player.y, 50, 50)
+
+
 
 class Player:
     def __init__(self):
@@ -80,23 +118,20 @@ class Player:
         self.state_machine.start(Idle)
         self.state_machine.set_transitions(
             {
-                Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run},
-                Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle},
+                Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, up_down : Jump},
+                Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, up_down: Jump},
+                Jump: {land : Idle},
             }
         )
         self.is_flying = True
+        self.face_dir = 1
 
     def update(self):
-        #self.frame = (self.frame + 1) % 8
-        #self.x += self.dir_x * 5
-        #self.y += self.dir_y * 5
         self.state_machine.update()
 
     def draw(self):
-        #self.image.clip_draw(self.frame * 200, 0, 50, 60, self.x, self.y)
         self.state_machine.draw()
         draw_rectangle(*self.get_bb())
-        pass
 
     def handle_event(self, event):
         self.state_machine.add_event(('INPUT', event))
