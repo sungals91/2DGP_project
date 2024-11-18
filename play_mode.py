@@ -28,6 +28,9 @@ def init():
     player = Player()
     game_world.add_object(player, 1)
 
+    # 충돌 처리물 등록
+    game_world.add_collision_pair('player:floor', player, floor)
+
 def finish():
     game_world.clear()
     pass
@@ -35,6 +38,7 @@ def finish():
 
 def update():
     game_world.update()
+    game_world.handle_collisions()
 
 def draw():
     clear_canvas()

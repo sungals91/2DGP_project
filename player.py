@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image, draw_rectangle
 from sdl2 import SDL_KEYDOWN, SDLK_RIGHT, SDLK_LEFT, SDLK_UP, SDLK_DOWN, SDL_KEYUP
 
 import game_framework
@@ -31,6 +31,8 @@ class Idle:
 
     @staticmethod
     def do(player):
+        if player.is_flying:
+            player.y -= 1
         player.frame = (player.frame + FRAMES_PER_ACTION*ACTION_PER_TIME*game_framework.frame_time) % 8
         pass
 
@@ -53,6 +55,8 @@ class Run:
 
     @staticmethod
     def do(player):
+        if player.is_flying:
+            player.y -= 1
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
         player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time
 
@@ -80,6 +84,7 @@ class Player:
                 Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle},
             }
         )
+        self.is_flying = True
 
     def update(self):
         #self.frame = (self.frame + 1) % 8
@@ -90,8 +95,18 @@ class Player:
     def draw(self):
         #self.image.clip_draw(self.frame * 200, 0, 50, 60, self.x, self.y)
         self.state_machine.draw()
+        draw_rectangle(*self.get_bb())
         pass
 
     def handle_event(self, event):
         self.state_machine.add_event(('INPUT', event))
+        pass
+
+    def get_bb(self):
+        return self.x -25, self.y - 25, self.x + 25, self.y + 25
+
+    def handle_collision(self, group, other):
+        if group == 'player:floor':
+            print('FLOOR COLLISION')
+            self.is_flying = False
         pass
