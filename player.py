@@ -35,7 +35,8 @@ class Idle:
     @staticmethod
     def do(player):
         if player.is_flying:
-            player.y -= 1
+            player.jump_speed -= GRAVITY * game_framework.frame_time
+            player.y += player.jump_speed * game_framework.frame_time
         player.frame = (player.frame + FRAMES_PER_ACTION*ACTION_PER_TIME*game_framework.frame_time) % 8
         pass
 
@@ -62,7 +63,8 @@ class Run:
     @staticmethod
     def do(player):
         if player.is_flying:
-            player.y -= 1
+            player.jump_speed -= GRAVITY * game_framework.frame_time
+            player.y += player.jump_speed * game_framework.frame_time
         player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
         player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time
 
@@ -111,6 +113,7 @@ class Jump:
 class Attack:
     @staticmethod
     def enter(player, e):
+        player.collide_state = 'atk'
         pass
 
     @staticmethod
@@ -121,6 +124,7 @@ class Attack:
     def do(player):
         player.frame = (player.frame + 6 * ACTION_PER_TIME * game_framework.frame_time) % 6
         if int(player.frame) == 5:
+            player.collide_state = 'idle'
             player.state_machine.add_event(('ATK_END', 0))
         pass
 
@@ -140,6 +144,7 @@ class Player:
         self.image = load_image('image\\player.png')
         self.x, self.y = 400, 300
         self.dir_x, self.dir_y = 0,0
+        self.jump_speed = 0
         self.frame = 0
         self.state_machine = StateMachine(self)
         self.state_machine.start(Idle)
@@ -153,6 +158,9 @@ class Player:
         )
         self.is_flying = True
         self.face_dir = 1
+        self.collide_state = 'idle'
+        self.hp = 1
+        self.exp = 0
 
     def update(self):
         self.state_machine.update()
@@ -166,10 +174,15 @@ class Player:
         pass
 
     def get_bb(self):
-        return self.x -25, self.y - 25, self.x + 25, self.y + 25
+        if self.collide_state == 'idle':
+            return self.x -25, self.y - 25, self.x + 25, self.y + 25
+        elif self.collide_state == 'atk':
+            return self.x -25, self.y - 25, self.x + 75, self.y + 25
 
     def handle_collision(self, group, other):
         if group == 'player:floor':
             print('FLOOR COLLISION')
             self.is_flying = False
+        elif group == 'player_atk:skeleton_hit' and self.collide_state == 'atk':
+            self.exp += 10
         pass

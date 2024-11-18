@@ -1,6 +1,7 @@
 from pico2d import *
 import random
 import game_framework
+import game_world
 from state_machine import *
 
 PIXEL_PER_METER = (10.0 / 0.2) # 10 pixel 20cm
@@ -75,12 +76,17 @@ class Walk:
                                           0, 'h', skeleton.x, skeleton.y, 50, 50)
         pass
 
+class Hit:
+    @staticmethod
+    def enter():
+        pass
+
 class Skeleton:
     image = None
     def __init__(self):
         if Skeleton.image == None:
             Skeleton.image = load_image('image\\skeleton.png')
-        self.x, self.y = 400, 300
+        self.x, self.y = 600, 300
         self.dir = random.choice([-1, 1])
         self.jump_speed = 0
         self.frame = 0
@@ -94,6 +100,7 @@ class Skeleton:
         )
         self.is_flying = True
         self.face_dir = 1
+        self.hp = 1
 
     def update(self):
         self.state_machine.update()
@@ -114,4 +121,9 @@ class Skeleton:
         if group == 'enemy:floor':
             print('FLOOR COLLISION')
             self.is_flying = False
+        if group == 'player_atk:skeleton_hit' and other.collide_state == 'atk':
+            print('SKELETON HIT')
+            self.hp -= 1
+            if self.hp == 0:
+                game_world.remove_object(self)
         pass

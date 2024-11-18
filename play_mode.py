@@ -36,6 +36,8 @@ def init():
 
     # 충돌 처리물 등록
     game_world.add_collision_pair('player:floor', player, floor)
+    game_world.add_collision_pair('enemy:floor', skeleton, floor)
+    game_world.add_collision_pair('player_atk:skeleton_hit', player, skeleton)
 
 def finish():
     game_world.clear()
