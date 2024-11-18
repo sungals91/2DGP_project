@@ -183,6 +183,10 @@ class Player:
         if group == 'player:floor':
             print('FLOOR COLLISION')
             self.is_flying = False
-        elif group == 'player_atk:skeleton_hit' and self.collide_state == 'atk':
-            self.exp += 10
+        elif group == 'player_atk:skeleton_hit':
+            if self.collide_state == 'atk':
+                self.exp += 10
+            elif self.collide_state == 'idle':
+                self.hp -= 1
+                print(f'{self.hp}')
         pass
