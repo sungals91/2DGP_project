@@ -43,20 +43,26 @@ class Run:
     @staticmethod
     def enter(player, e):
         if right_down(e) or left_up(e): # 오른쪽으로 RUN
-            player.dir, player.face_dir, player.action = 1, 1, 1
+            player.dir, player.face_dir = 1, 1
         elif left_down(e) or right_up(e): # 왼쪽으로 RUN
-            player.dir, player.face_dir, player.action = -1, -1, 0
+            player.dir, player.face_dir  = -1, -1
 
     @staticmethod
     def exit(player, e):
         pass
 
     @staticmethod
-    def do(player, e):
-        pass
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        player.x += player.dir * RUN_SPEED_PPS * game_framework.frame_time
 
     @staticmethod
-    def draw(player, e):
+    def draw(player):
+        if player.face_dir == 1:
+            player.image.clip_draw(int(player.frame) * 200, 75 * 6, 50, 50, player.x, player.y)
+        elif player.face_dir == -1:
+            player.image.clip_composite_draw(int(player.frame) * 200, 75 * 6, 50, 50,
+                                          0, 'h', player.x, player.y, 50, 50)
         pass
 
 

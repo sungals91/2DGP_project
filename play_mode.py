@@ -4,6 +4,7 @@ import game_framework
 import game_world
 from player import Player
 from background import Background
+from floor import Floor
 
 def handle_events():
     events = get_events()
@@ -20,6 +21,9 @@ def init():
 
     background = Background()
     game_world.add_object(background, 0)
+
+    floor = Floor()
+    game_world.add_object(floor, 0)
 
     player = Player()
     game_world.add_object(player, 1)
