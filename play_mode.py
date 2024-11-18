@@ -5,6 +5,7 @@ import game_world
 from player import Player
 from background import Background
 from floor import Floor
+from skeleton import Skeleton
 
 def handle_events():
     events = get_events()
@@ -27,6 +28,11 @@ def init():
 
     player = Player()
     game_world.add_object(player, 1)
+
+    skeleton = Skeleton()
+    game_world.add_object(skeleton, 1)
+
+
 
     # 충돌 처리물 등록
     game_world.add_collision_pair('player:floor', player, floor)

@@ -91,7 +91,7 @@ class Jump:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
+        player.frame = (player.frame + 2 * ACTION_PER_TIME * game_framework.frame_time) % 2
         player.jump_speed -= GRAVITY * game_framework.frame_time
         player.y += player.jump_speed * game_framework.frame_time
         if player.jump_speed <= 0:
