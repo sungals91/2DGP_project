@@ -41,8 +41,11 @@ class Idle:
 
     @staticmethod
     def draw(player):
-        player.image.clip_draw(int(player.frame) * 200, 0, 50, 60, player.x, player.y)
-
+        if player.face_dir == 1:
+            player.image.clip_draw(int(player.frame) * 200, 0, 50, 50, player.x, player.y)
+        elif player.face_dir == -1:
+            player.image.clip_composite_draw(int(player.frame) * 200, 0, 50, 50,
+                                          0, 'h', player.x, player.y, 50, 50)
 
 class Run:
     @staticmethod
@@ -70,7 +73,6 @@ class Run:
         elif player.face_dir == -1:
             player.image.clip_composite_draw(int(player.frame) * 200, 75 * 6, 50, 50,
                                           0, 'h', player.x, player.y, 50, 50)
-        pass
 
 class Jump:
     @staticmethod
@@ -106,6 +108,29 @@ class Jump:
             player.image.clip_composite_draw(int(player.frame) * 200, 75 * 4, 50, 50,
                                              0, 'h', player.x, player.y, 50, 50)
 
+class Attack:
+    @staticmethod
+    def enter(player, e):
+        pass
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 5
+        pass
+
+    @staticmethod
+    def draw(player):
+        if player.face_dir == 1:
+            player.image.clip_draw(int(player.frame) * 200, 75 * 1, 125, 75, player.x + (125/2) - 25, player.y + (75/2)-25)
+        elif player.face_dir == -1:
+            player.image.clip_composite_draw(int(player.frame) * 200, 75 * 1, 125, 75,
+                                          0, 'h', player.x - (125/2) + 25, player.y + (75/2)-25, 125, 75)
+        pass
+
 
 
 class Player:
@@ -118,9 +143,10 @@ class Player:
         self.state_machine.start(Idle)
         self.state_machine.set_transitions(
             {
-                Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, up_down : Jump},
-                Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, up_down: Jump},
-                Jump: {land : Idle},
+                Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, up_down : Jump, a_down : Attack},
+                Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, up_down: Jump, a_down : Attack},
+                Jump: {land : Idle, a_down : Attack},
+                Attack: {},
             }
         )
         self.is_flying = True
